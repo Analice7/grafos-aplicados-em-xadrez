@@ -43,33 +43,46 @@ public class Tabuleiro {
         construirGrafoMovimentos();
     }
 
+    public boolean isCheckMate(String cor) {
+        // Cria uma cópia defensiva do mapa de peças
+        Map<String, Peca> copiaPecas = new HashMap<>(pecas);
+        
+        if (!estaEmXeque(cor)) return false;
+        
+        for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
+            if (entry.getValue().getCor().equals(cor)) {
+                // Cria cópia da lista de movimentos válidos
+                List<String> movimentos = new ArrayList<>(
+                    entry.getValue().movimentosValidos(entry.getKey(), this)
+                );
+                if (!movimentos.isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     public boolean estaEmXeque(String cor) {
         String posicaoRei = encontrarPosicaoRei(cor);
         if (posicaoRei == null) return false;
         
-        for (Map.Entry<String, Peca> entry : pecas.entrySet()) {
+        // Cria cópia defensiva do mapa de peças
+        Map<String, Peca> copiaPecas = new HashMap<>(pecas);
+        
+        for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
             Peca peca = entry.getValue();
             if (!peca.getCor().equals(cor)) {
-                List<String> ameacas = peca.movimentosBasicos(entry.getKey(), this);
+                // Cria cópia da lista de ameaças
+                List<String> ameacas = new ArrayList<>(
+                    peca.movimentosBasicos(entry.getKey(), this)
+                );
                 if (ameacas.contains(posicaoRei)) {
                     return true;
                 }
             }
         }
         return false;
-    }
-    
-    public boolean isCheckMate(String cor) {
-        if (!estaEmXeque(cor)) return false;
-        
-        for (Map.Entry<String, Peca> entry : pecas.entrySet()) {
-            if (entry.getValue().getCor().equals(cor)) {
-                if (!entry.getValue().movimentosValidos(entry.getKey(), this).isEmpty()) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
     
     public void construirGrafoMovimentos() {
