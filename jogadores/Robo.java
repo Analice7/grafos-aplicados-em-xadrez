@@ -1,9 +1,29 @@
+package jogadores;
 import java.util.*;
 
-public class IA {
+import xadrez.Peca;
+import xadrez.Tabuleiro;
+import regras.RegrasXadrez;
+
+public class Robo extends Jogador{
+
+    public Robo(String cor) {
+        super(cor);
+    }
+
+    // Constante que define a profundidade máxima de busca no algoritmo Minimax
     private static final int PROFUNDIDADE_MAXIMA = 3;
     
-    public String[] melhorJogada(Tabuleiro tabuleiro, String cor) {
+    /**
+     * Método principal que decide a melhor jogada para o robô.
+     * Implementa a lógica de decisão usando o algoritmo Minimax.
+     * @param tabuleiro o estado atual do tabuleiro
+     * @param cor a cor das peças do robô
+     * @param scanner scanner para entrada (não utilizado pelo robô)
+     * @return array com as posições de origem e destino da melhor jogada encontrada
+     */
+    @Override
+    public String[] obterJogada(Tabuleiro tabuleiro, String cor, Scanner scanner) {
         int melhorValor = Integer.MIN_VALUE;
         String[] melhorJogada = null;
         
@@ -35,6 +55,17 @@ public class IA {
         return melhorJogada;
     }
     
+    /**
+     * Implementação do algoritmo Minimax com poda Alpha-Beta.
+     * Avalia recursivamente todas as possíveis jogadas até a profundidade máxima.
+     * @param tabuleiro estado atual do tabuleiro
+     * @param profundidade profundidade atual da busca
+     * @param alpha valor alpha para poda (limite inferior)
+     * @param beta valor beta para poda (limite superior)
+     * @param maximizando indica se está maximizando (true) ou minimizando (false) o valor
+     * @param cor cor das peças do robô
+     * @return valor de avaliação da posição atual
+     */
     private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, 
                        boolean maximizando, String cor) {
         // 4. Crie uma cópia defensiva para o minimax
@@ -47,7 +78,7 @@ public class IA {
         int valor = maximizando ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         
         for (Map.Entry<String, Peca> entry : pecasCopia.entrySet()) {
-            if (entry.getValue().getCor().equals(maximizando ? cor : outraCor(cor))) {
+            if (entry.getValue().getCor().equals(maximizando ? cor : corOposta(cor))) {
                 String origem = entry.getKey();
                 Peca peca = entry.getValue();
                 
@@ -75,10 +106,22 @@ public class IA {
         return valor;
     }
     
-    private String outraCor(String cor) {
+    /**
+     * Retorna a cor oposta à fornecida.
+     * @param cor cor atual ("branca" ou "preta")
+     * @return cor oposta
+     */
+    private String corOposta(String cor) {
         return cor.equals("branca") ? "preta" : "branca";
     }
     
+    /**
+     * Avalia o estado atual do tabuleiro para a cor especificada.
+     * Considera o valor material das peças e sua posição no tabuleiro.
+     * @param tabuleiro estado atual do tabuleiro
+     * @param cor cor do jogador sendo avaliado
+     * @return valor numérico representando a vantagem da posição
+     */
     private int avaliarTabuleiro(Tabuleiro tabuleiro, String cor) {
         int valorTotal = 0;
         Map<String, Peca> pecas = tabuleiro.getPecas();
@@ -105,70 +148,25 @@ public class IA {
         
         return valorTotal;
     }
-    
+
     private boolean jogoAcabou(Tabuleiro tabuleiro, String cor) {
         // 1. Verifica xeque-mate
-        if (tabuleiro.isCheckMate(cor)) {
+        if (RegrasXadrez.estaEmXeque(cor, tabuleiro)) {
             return true;
         }
         
         // 2. Verifica afogamento (stalemate)
-        if (isStalemate(tabuleiro, cor)) {
+        if (RegrasXadrez.afogamento(cor, tabuleiro)) {
             return true;
         }
         
         // 3. Verifica material insuficiente
-        if (isMaterialInsufficient(tabuleiro)) {
+        if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
             return true;
         }
         
         // 4. Verifica repetição de posições (opcional)
         // if (isRepeticaoPosicoes()) {...}
-        
-        return false;
-    }
-    
-    private boolean isStalemate(Tabuleiro tabuleiro, String cor) {
-        // Afogamento ocorre quando o jogador não está em xeque mas não tem movimentos válidos
-        if (!tabuleiro.estaEmXeque(cor)) {
-            for (Map.Entry<String, Peca> entry : tabuleiro.getPecas().entrySet()) {
-                if (entry.getValue().getCor().equals(cor)) {
-                    if (!entry.getValue().movimentosValidos(entry.getKey(), tabuleiro).isEmpty()) {
-                        return false; // Ainda tem movimentos válidos
-                    }
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    private boolean isMaterialInsufficient(Tabuleiro tabuleiro) {
-        Map<String, Peca> pecas = tabuleiro.getPecas();
-        int contagemPecas = pecas.size();
-        
-        // Casos de material insuficiente:
-        // 1. Apenas os dois reis
-        if (contagemPecas == 2) return true;
-        
-        // 2. Rei + bispo vs Rei
-        // 3. Rei + cavalo vs Rei
-        if (contagemPecas == 3) {
-            boolean apenasBispoOuCavalo = true;
-            for (Peca peca : pecas.values()) {
-                if (!(peca instanceof Rei) && !(peca instanceof Bispo) && !(peca instanceof Cavalo)) {
-                    apenasBispoOuCavalo = false;
-                    break;
-                }
-            }
-            return apenasBispoOuCavalo;
-        }
-        
-        // 4. Rei + bispo vs Rei + bispo (mesma cor do quadrado)
-        if (contagemPecas == 4) {
-            // Implementação mais complexa para verificar bispos em quadrados da mesma cor
-            // Pode ser implementada se necessário
-        }
         
         return false;
     }

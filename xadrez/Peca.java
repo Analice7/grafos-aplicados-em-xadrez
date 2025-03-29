@@ -1,4 +1,6 @@
+package xadrez;
 import java.util.*;
+import regras.RegrasXadrez;
 
 public abstract class Peca {
     protected String cor;
@@ -17,7 +19,7 @@ public abstract class Peca {
         
         for (String destino : movimentos) {
             Peca capturada = tabuleiro.simularMovimento(posicao, destino);
-            boolean emXeque = tabuleiro.estaEmXeque(this.getCor());
+            boolean emXeque = RegrasXadrez.estaEmXeque(cor, tabuleiro);
             tabuleiro.desfazerSimulacao(posicao, destino, capturada);
             
             if (!emXeque) {
@@ -40,7 +42,7 @@ public abstract class Peca {
         return getClass().getSimpleName() + "(" + cor + ")";
     }
     
-    protected static int[] parsePosicao(String posicao) {
+    public static int[] parsePosicao(String posicao) {
         int col = posicao.charAt(0) - 'a';
         int lin = Character.getNumericValue(posicao.charAt(1)) - 1;
         return new int[]{lin, col};
@@ -57,7 +59,7 @@ public abstract class Peca {
         
         for (String destino : movimentos) {
             Peca capturada = tabuleiro.simularMovimento(posicaoOrigem, destino);
-            boolean emXeque = tabuleiro.estaEmXeque(cor);
+            boolean emXeque = RegrasXadrez.estaEmXeque(cor, tabuleiro);
             tabuleiro.desfazerSimulacao(posicaoOrigem, destino, capturada);
             
             if (!emXeque) {

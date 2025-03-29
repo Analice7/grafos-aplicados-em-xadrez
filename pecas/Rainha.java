@@ -1,4 +1,8 @@
+package pecas;
 import java.util.*;
+
+import xadrez.Peca;
+import xadrez.Tabuleiro;
 
 public class Rainha extends Peca {
     public Rainha(String cor) {

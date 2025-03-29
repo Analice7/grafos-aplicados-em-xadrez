@@ -1,11 +1,15 @@
+package pecas;
 import java.util.*;
 
-class Torre extends Peca {
-    public Torre(String cor) {
+import xadrez.Peca;
+import xadrez.Tabuleiro;
+
+public class Bispo extends Peca {
+    public Bispo(String cor) {
         super(cor);
-        this.valor = 5;
+        this.valor = 3; 
     }
-    
+
     @Override
     public List<String> movimentosBasicos(String posicao, Tabuleiro tabuleiro) {
         List<String> movimentos = new ArrayList<>();
@@ -13,8 +17,8 @@ class Torre extends Peca {
         int lin = pos[0];
         int col = pos[1];
         
-        // Movimentos nas 4 direções
-        int[][] direcoes = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        // Movimentos nas 4 diagonais
+        int[][] direcoes = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
         
         for (int[] dir : direcoes) {
             for (int i = 1; i < 8; i++) {

@@ -1,6 +1,10 @@
+package pecas;
 import java.util.*;
 
-class Peao extends Peca {
+import xadrez.Peca;
+import xadrez.Tabuleiro;
+
+public class Peao extends Peca {
     public Peao(String cor) {
         super(cor);
         this.valor = 1;

@@ -1,4 +1,8 @@
+package pecas;
 import java.util.*;
+
+import xadrez.Peca;
+import xadrez.Tabuleiro;
 
 public class Rei extends Peca {
     public Rei(String cor) {

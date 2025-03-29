@@ -1,9 +1,13 @@
+package pecas;
 import java.util.*;
+
+import xadrez.Peca;
+import xadrez.Tabuleiro;
 
 public class Cavalo extends Peca {
     public Cavalo(String cor) {
         super(cor);
-        this.valor = 3; // Valor do cavalo no xadrez
+        this.valor = 3; 
     }
 
     @Override
@@ -14,6 +18,7 @@ public class Cavalo extends Peca {
         int col = pos[1];
         
         int[][] offsets = {
+            // Movimentos em L
             {2,1}, {2,-1}, {-2,1}, {-2,-1},
             {1,2}, {1,-2}, {-1,2}, {-1,-2}
         };

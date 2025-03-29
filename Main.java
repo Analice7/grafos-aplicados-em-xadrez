@@ -1,4 +1,13 @@
+
+
 import java.util.*;
+
+import jogadores.Humano;
+import jogadores.Jogador;
+import jogadores.Robo;
+import xadrez.Peca;
+import xadrez.Tabuleiro;
+import regras.RegrasXadrez;
 
 public class Main {
     private final Tabuleiro tabuleiro;
@@ -8,8 +17,8 @@ public class Main {
     
     public Main() {
         this.tabuleiro = new Tabuleiro();
-        this.jogadorBranco = new Jogador("branca", false);
-        this.jogadorPreto = new Jogador("preta", true);
+        this.jogadorBranco = new Humano("branca");
+        this.jogadorPreto = new Robo("preta");
         this.jogadorAtual = jogadorBranco;
     }
     
@@ -18,7 +27,7 @@ public class Main {
             while (true) {
                 mostrarTabuleiro();
                 
-                String resultado = verificarFimDeJogo();
+                String resultado = verificarFimDeJogo(tabuleiro);
                 if (resultado != null) {
                     System.out.println(resultado);
                     break;
@@ -35,25 +44,8 @@ public class Main {
         }
     }
 
-    private String verificarFimDeJogo() {
-        // Verifica para ambos os jogadores
-        if (tabuleiro.isCheckMate("branca")) {
-            return "Xeque-mate! As pretas venceram!";
-        }
-        if (tabuleiro.isCheckMate("preta")) {
-            return "Xeque-mate! As brancas venceram!";
-        }
-        if (tabuleiro.isStalemate(jogadorAtual.getCor())) {
-            return "Afogamento! O jogo terminou em empate.";
-        }
-        if (tabuleiro.isMaterialInsufficient()) {
-            return "Material insuficiente para dar mate. Empate!";
-        }
-        return null;
-    }
-
     private String[] obterJogadaValida(Scanner scanner) {
-        if (jogadorAtual.ehIA()) {
+        if (jogadorAtual instanceof Robo) {
             System.out.println("IA está pensando...");
             try {
                 Thread.sleep(1000); // Pausa dramática
@@ -61,19 +53,42 @@ public class Main {
                 e.printStackTrace();
             }
             
-            String[] jogadaIA = jogadorAtual.getIA().melhorJogada(tabuleiro, jogadorAtual.getCor());
+            String[] jogadaRobo = jogadorAtual.obterJogada(tabuleiro, jogadorAtual.getCor(), scanner);
             
-            if (jogadaIA != null) {
-                System.out.println("IA jogou: " + jogadaIA[0] + " " + jogadaIA[1]);
-                return jogadaIA;
+            if (jogadaRobo != null) {
+                System.out.println("Robo jogou: " + jogadaRobo[0] + " " + jogadaRobo[1]);
+                return jogadaRobo;
             }
             
-            System.out.println("IA não encontrou movimentos válidos!");
+            System.out.println("Robo não encontrou movimentos válidos!");
             return new String[]{"a1", "a1"}; // Movimento de fallback
         }
         
         // Lógica do jogador humano (permanece idêntica)
-        return jogadorAtual.obterJogadaHumana(scanner);
+        return jogadorAtual.obterJogada(tabuleiro, jogadorAtual.getCor(), scanner);
+    }
+
+    /**
+     * Verifica se o jogo terminou em alguma condição de fim de jogo.
+     * @param tabuleiro estado atual do tabuleiro
+     * @param cor cor do jogador atual
+     * @return true se o jogo terminou, false caso contrário
+     */
+    private String verificarFimDeJogo(Tabuleiro tabuleiro) {
+        // Verifica para ambos os jogadores
+        if (RegrasXadrez.estaEmXequeMate("branca", tabuleiro)) {
+            return "Xeque-mate! As pretas venceram!";
+        }
+        if (RegrasXadrez.estaEmXequeMate("preta", tabuleiro)) {
+            return "Xeque-mate! As brancas venceram!";
+        }
+        if (RegrasXadrez.afogamento(jogadorAtual.getCor(), tabuleiro)) {
+            return "Afogamento! O jogo terminou em empate.";
+        }
+        if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
+            return "Material insuficiente para dar mate. Empate!";
+        }
+        return null;
     }
     
     private void mostrarTabuleiro() {
