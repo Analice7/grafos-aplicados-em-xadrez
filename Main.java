@@ -7,6 +7,8 @@ import jogadores.Jogador;
 import jogadores.Robo;
 import pecas.Peao;
 import pecas.Rei;
+import xadrez.ListaPosicoes;
+import xadrez.NoPosicao;
 import xadrez.Peca;
 import xadrez.Tabuleiro;
 import regras.RegrasXadrez;
@@ -16,12 +18,14 @@ public class Main {
     private final Jogador jogadorBranco;
     private final Jogador jogadorPreto;
     private Jogador jogadorAtual;
-    
+    private ListaPosicoes lista;
+
     public Main() {
         this.tabuleiro = new Tabuleiro();
         this.jogadorBranco = new Humano("branca");
         this.jogadorPreto = new Robo("preta");
         this.jogadorAtual = jogadorBranco;
+        this.lista = new ListaPosicoes();
     }
     
     public void iniciarJogo() {
@@ -48,6 +52,7 @@ public class Main {
                 			jogada[0].charAt(0)==jogada[1].charAt(0)-2 ){
                 		tabuleiro.rocar(jogada[1], jogadorAtual.getCor());
                 	}	
+                	lista.inserir(new NoPosicao(tabuleiro.getPecas()));
                     jogadorAtual = (jogadorAtual == jogadorBranco) ? jogadorPreto : jogadorBranco;
                 }
             }
@@ -98,6 +103,9 @@ public class Main {
         }
         if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
             return "Material insuficiente para dar mate. Empate!";
+        }
+        if(lista.empatePorRepeticao()) {
+        	return "Empate! a mesma posição foi repetida 3 vezes";
         }
         return null;
     }

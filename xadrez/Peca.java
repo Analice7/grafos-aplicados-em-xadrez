@@ -1,4 +1,4 @@
-package xadrez;
+	package xadrez;
 import java.util.*;
 import regras.RegrasXadrez;
 
