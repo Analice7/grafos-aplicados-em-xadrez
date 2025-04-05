@@ -48,8 +48,8 @@ public class Main {
                 			tabuleiro.promoverPeao(jogada[1]);
                 		}
                 	}
-                	if(tabuleiro.getPeca(jogada[1]) instanceof Rei && jogada[0].charAt(0)==jogada[1].charAt(0)+2 || 
-                			jogada[0].charAt(0)==jogada[1].charAt(0)-2 ){
+                	if(tabuleiro.getPeca(jogada[1]) instanceof Rei && (jogada[0].charAt(0)==jogada[1].charAt(0)+2 || 
+                			jogada[0].charAt(0)==jogada[1].charAt(0)-2 )){
                 		tabuleiro.rocar(jogada[1], jogadorAtual.getCor());
                 	}	
                 	lista.inserir(new NoPosicao(tabuleiro.getPecas()));
@@ -104,7 +104,7 @@ public class Main {
         if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
             return "Material insuficiente para dar mate. Empate!";
         }
-        if(RegrasXadrez.regraDos50Lances(tabuleiro)) {
+        if(RegrasXadrez.empateDos50Lances(tabuleiro)) {
         	return "Empate! 50 movimentos foram realizados sem captura ou movimento de peão";
         }
         if(lista.empatePorRepeticao()) {

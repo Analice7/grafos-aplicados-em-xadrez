@@ -116,7 +116,7 @@ public class RegrasXadrez {
         return false;
     }
 
-    public static boolean regraDos50Lances(Tabuleiro tabuleiro){
+    public static boolean empateDos50Lances(Tabuleiro tabuleiro){
     	if(tabuleiro.getContadorLances()==50) {
     		return true;
     	}
