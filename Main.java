@@ -104,6 +104,9 @@ public class Main {
         if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
             return "Material insuficiente para dar mate. Empate!";
         }
+        if(RegrasXadrez.regraDos50Lances(tabuleiro)) {
+        	return "Empate! 50 movimentos foram realizados sem captura ou movimento de peão";
+        }
         if(lista.empatePorRepeticao()) {
         	return "Empate! a mesma posição foi repetida 3 vezes";
         }

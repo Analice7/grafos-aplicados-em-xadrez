@@ -11,10 +11,13 @@ import pecas.Torre;
 public class Tabuleiro {
     private Grafo grafo;
     private Map<String, Peca> pecas;
-    
+    //contador de lances consecutivos sem captura ou movimento de peão
+    private int contadorLances;
+
     public Tabuleiro() {
         this.grafo = new Grafo();
         this.pecas = new HashMap<>();
+        this.contadorLances=0;
         inicializarTabuleiro();
     }
     
@@ -83,6 +86,11 @@ public class Tabuleiro {
     public boolean moverPeca(String origem, String destino) {
         if (pecas.containsKey(origem) && grafo.bfs(origem).contains(destino)) {
             Peca pecaMovida = pecas.remove(origem);
+            if(getPeca(destino)==null && !(pecaMovida instanceof Peao)) {
+                ++contadorLances;
+            }else {
+            	contadorLances=0;
+            }
             pecas.put(destino, pecaMovida);
             construirGrafoMovimentos();
             return true;
@@ -226,4 +234,14 @@ public class Tabuleiro {
         torreDireita.mover();
         rei.mover();
 	}
+
+
+	/**
+	 * método que retorna o tanto de lances consecutivos sem captura ou movimentos de peão 
+	 * 
+	 */
+	public int getContadorLances() {
+		return contadorLances;
+	}
+    
 }
