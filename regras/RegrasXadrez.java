@@ -17,9 +17,8 @@ public class RegrasXadrez {
     // Verifica se o rei da cor especificada está em xeque-mate
     // Retorna true se o rei está em xeque e não há movimentos legais que possam tirá-lo do xeque
     public static boolean estaEmXequeMate(String cor, Tabuleiro tabuleiro) {
-        Map<String, Peca> pecas = tabuleiro.getPecas(); 
-        // Cria uma cópia defensiva do mapa de peças
-        Map<String, Peca> copiaPecas = new HashMap<>(pecas);
+        
+        Map<String, Peca> copiaPecas = new HashMap<>(tabuleiro.getPecas());
         
         if (!estaEmXeque(cor, tabuleiro)) return false;
         
@@ -40,13 +39,14 @@ public class RegrasXadrez {
     // Verifica se o rei da cor especificada está em xeque
     // Retorna true se alguma peça adversária está atacando a posição do rei
     public static boolean estaEmXeque(String cor, Tabuleiro tabuleiro) {
-        Map<String, Peca> pecas = tabuleiro.getPecas(); 
+
         String posicaoRei = encontrarPosicaoRei(cor, tabuleiro);
+
         if (posicaoRei == null) return false;
         
-        // Cria cópia defensiva do mapa de peças
+        Map<String, Peca> copiaPecas = new HashMap<>(tabuleiro.getPecas());
         
-        for (Map.Entry<String, Peca> entry : pecas.entrySet()) {
+        for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
             Peca peca = entry.getValue();
             if (!peca.getCor().equals(cor)) {
                 // Cria cópia da lista de ameaças
@@ -114,5 +114,12 @@ public class RegrasXadrez {
             return true;
         }
         return false;
+    }
+
+    public static boolean empateDos50Lances(Tabuleiro tabuleiro){
+    	if(tabuleiro.getContadorLances()==50) {
+    		return true;
+    	}
+    	return false;
     }
 }

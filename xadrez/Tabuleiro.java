@@ -11,10 +11,13 @@ import pecas.Torre;
 public class Tabuleiro {
     private Grafo grafo;
     private Map<String, Peca> pecas;
-    
+    //contador de lances consecutivos sem captura ou movimento de peão
+    private int contadorLances;
+
     public Tabuleiro() {
         this.grafo = new Grafo();
         this.pecas = new HashMap<>();
+        this.contadorLances=0;
         inicializarTabuleiro();
     }
     
@@ -83,6 +86,11 @@ public class Tabuleiro {
     public boolean moverPeca(String origem, String destino) {
         if (pecas.containsKey(origem) && grafo.bfs(origem).contains(destino)) {
             Peca pecaMovida = pecas.remove(origem);
+            if(getPeca(destino)==null && !(pecaMovida instanceof Peao)) {
+                ++contadorLances;
+            }else {
+            	contadorLances=0;
+            }
             pecas.put(destino, pecaMovida);
             construirGrafoMovimentos();
             return true;
@@ -100,8 +108,45 @@ public class Tabuleiro {
         pecas.put(destino, pecaMovida);
         return capturada;
     }
-    
-    // Desfaz uma simulação de movimento, restaurando o tabuleiro ao estado anterior
+
+    public void promoverPeao(String posicao, Scanner scanner) {
+		if(getPeca(posicao) instanceof Peao) {
+			switch(posicao.charAt(1)) {
+			case '1':
+				getPecasOriginais().put(posicao, new Rainha("preta"));
+				break;
+			case '8':
+				while(true) {
+					System.out.println("insira o nome da peca para qual desejas promover o peão");
+					String opcao = scanner.nextLine();
+					switch(opcao.toLowerCase()){
+						case "cavalo":
+							getPecasOriginais().put(posicao, new Cavalo("branca"));
+							return;
+						case "bispo":
+							getPecasOriginais().put(posicao, new Bispo("branca"));
+							return;
+						case "torre":
+							getPecasOriginais().put(posicao, new Torre("branca"));
+							return;
+						case "rainha":
+							getPecasOriginais().put(posicao, new Rainha("branca"));
+							return;
+						default:
+							System.out.println("insira um nome valido: \n Rainha \n Cavalo \n Bispo \n Torre" );
+					}
+				}
+			}
+		}
+		//indica que a peça já se moveu, caso o peão vire uma torre isso será importante para evitar roques inválidos
+		getPeca(posicao).mover();	
+	}
+
+	public Map<String, Peca> getPecasOriginais() {
+		return pecas;
+	}
+
+	// Desfaz uma simulação de movimento, restaurando o tabuleiro ao estado anterior
     // Recebe as posições de origem e destino e a peça que foi capturada na simulação
     public void desfazerSimulacao(String origem, String destino, Peca pecaCapturada) {
         Peca pecaMovida = pecas.remove(destino);
@@ -120,4 +165,81 @@ public class Tabuleiro {
     public Map<String, Peca> getPecas() {
         return new HashMap<>(pecas);
     }
+
+
+    public void rocar(String destino, String cor) {
+    	if(destino.equals("c1") || destino.equals("c8")) {
+    		fazerRoqueMaior(cor);
+    	}
+    	else{
+    		fazerRoqueMenor(cor);
+    	}
+	}
+
+
+    public void fazerRoqueMaior(String corJogador){
+		Peca rei;
+		Peca torreEsquerda;
+		//remove-se as peças rei e torre da posição atual e realoca-se elas nas casas pós-roque
+		if(corJogador.equals("branca")) { 
+			pecas.remove("e1");
+			pecas.remove("a1");
+			pecas.put("c1", new Rei(corJogador));
+	        pecas.put("d1", new Torre(corJogador));
+	        //atualização do booleano "moveu"
+	        rei = getPeca("c1");
+	        torreEsquerda = getPeca("d1");
+		}
+		//a lógica para as peças pretas é análoga
+		else{ 
+			pecas.put("c8", new Rei(corJogador));
+			pecas.remove("e8");
+			pecas.remove("a8");
+	        pecas.put("d8", new Torre(corJogador));
+	        //atualização do booleano "moveu"
+	        rei = getPeca("c8");
+	        torreEsquerda = getPeca("d8");
+		}        
+		//indica que as peças se moveram(evitando futuros roques ilegais)
+		rei.mover();
+        torreEsquerda.mover();
+	}
+
+
+
+	public void fazerRoqueMenor(String corJogador) {
+		Peca rei;
+		Peca torreDireita;
+		//remove o rei e a torre de suas posições as coloca nas posições pós-roque
+		if(corJogador.equals("branca")){
+			pecas.remove("e1");
+			pecas.remove("h1");
+			pecas.put("g1", new Rei(corJogador));
+	        pecas.put("f1", new Torre(corJogador));
+			rei = getPeca("g1");
+			torreDireita = getPeca("f1");
+		}
+		//lógica análoga para as pretas
+		else{
+			pecas.remove("e8");
+			pecas.remove("h8");
+			pecas.put("g8", new Rei(corJogador));
+	        pecas.put("f8", new Torre(corJogador));
+			rei = getPeca("g8");
+			torreDireita = getPeca("f8");
+		}
+		//indica que a torre e o rei se moveram (evitando futuros roques ilegais) 
+        torreDireita.mover();
+        rei.mover();
+	}
+
+
+	/**
+	 * método que retorna o tanto de lances consecutivos sem captura ou movimentos de peão 
+	 * 
+	 */
+	public int getContadorLances() {
+		return contadorLances;
+	}
+    
 }

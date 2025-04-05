@@ -5,10 +5,11 @@ import regras.RegrasXadrez;
 public abstract class Peca {
     protected String cor;
     protected int valor;
-    
+    protected boolean moveu_se;
     public Peca(String cor) {
         this.cor = cor;
         this.valor = 0;
+        this.moveu_se=false;
     }
     
     public abstract List<String> movimentosBasicos(String posicao, Tabuleiro tabuleiro);
@@ -67,5 +68,11 @@ public abstract class Peca {
             }
         }
         return validos;
+    }
+    public boolean seMoveu() {
+    	return moveu_se;
+    }
+    public void mover() {
+    	moveu_se=true;
     }
 }

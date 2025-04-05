@@ -5,6 +5,10 @@ import java.util.*;
 import jogadores.Humano;
 import jogadores.Jogador;
 import jogadores.Robo;
+import pecas.Peao;
+import pecas.Rei;
+import xadrez.ListaPosicoes;
+import xadrez.NoPosicao;
 import xadrez.Peca;
 import xadrez.Tabuleiro;
 import regras.RegrasXadrez;
@@ -14,12 +18,14 @@ public class Main {
     private final Jogador jogadorBranco;
     private final Jogador jogadorPreto;
     private Jogador jogadorAtual;
-    
+    private ListaPosicoes lista;
+
     public Main() {
         this.tabuleiro = new Tabuleiro();
         this.jogadorBranco = new Humano("branca");
         this.jogadorPreto = new Robo("preta");
         this.jogadorAtual = jogadorBranco;
+        this.lista = new ListaPosicoes();
     }
     
     public void iniciarJogo() {
@@ -37,6 +43,16 @@ public class Main {
                 String[] jogada = obterJogadaValida(scanner);
                 
                 if (tabuleiro.moverPeca(jogada[0], jogada[1])) {
+                	if(tabuleiro.getPeca(jogada[1]) instanceof Peao) {
+                		if(jogada[1].charAt(1)=='1' || jogada[1].charAt(1)=='8') {
+                			tabuleiro.promoverPeao(jogada[1]);
+                		}
+                	}
+                	if(tabuleiro.getPeca(jogada[1]) instanceof Rei && (jogada[0].charAt(0)==jogada[1].charAt(0)+2 || 
+                			jogada[0].charAt(0)==jogada[1].charAt(0)-2 )){
+                		tabuleiro.rocar(jogada[1], jogadorAtual.getCor());
+                	}	
+                	lista.inserir(new NoPosicao(tabuleiro.getPecas()));
                     jogadorAtual = (jogadorAtual == jogadorBranco) ? jogadorPreto : jogadorBranco;
                 }
             }
@@ -87,6 +103,12 @@ public class Main {
         }
         if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
             return "Material insuficiente para dar mate. Empate!";
+        }
+        if(RegrasXadrez.empateDos50Lances(tabuleiro)) {
+        	return "Empate! 50 movimentos foram realizados sem captura ou movimento de peão";
+        }
+        if(lista.empatePorRepeticao()) {
+        	return "Empate! a mesma posição foi repetida 3 vezes";
         }
         return null;
     }
