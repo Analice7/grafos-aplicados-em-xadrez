@@ -45,7 +45,7 @@ public class Main {
                 if (tabuleiro.moverPeca(jogada[0], jogada[1])) {
                 	if(tabuleiro.getPeca(jogada[1]) instanceof Peao) {
                 		if(jogada[1].charAt(1)=='1' || jogada[1].charAt(1)=='8') {
-                			tabuleiro.promoverPeao(jogada[1]);
+                			tabuleiro.promoverPeao(jogada[1], scanner);
                 		}
                 	}
                 	if(tabuleiro.getPeca(jogada[1]) instanceof Rei && (jogada[0].charAt(0)==jogada[1].charAt(0)+2 || 
