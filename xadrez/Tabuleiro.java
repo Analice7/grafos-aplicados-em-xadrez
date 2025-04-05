@@ -109,7 +109,7 @@ public class Tabuleiro {
         return capturada;
     }
 
-    public void promoverPeao(String posicao) {
+    public void promoverPeao(String posicao, Scanner scanner) {
 		if(getPeca(posicao) instanceof Peao) {
 			switch(posicao.charAt(1)) {
 			case '1':
@@ -118,8 +118,7 @@ public class Tabuleiro {
 			case '8':
 				while(true) {
 					System.out.println("insira o nome da peca para qual desejas promover o peão");
-					Scanner sc = new Scanner(System.in);
-					String opcao = sc.nextLine();
+					String opcao = scanner.nextLine();
 					switch(opcao.toLowerCase()){
 						case "cavalo":
 							getPecasOriginais().put(posicao, new Cavalo("branca"));
@@ -136,7 +135,6 @@ public class Tabuleiro {
 						default:
 							System.out.println("insira um nome valido: \n Rainha \n Cavalo \n Bispo \n Torre" );
 					}
-					sc.close();
 				}
 			}
 		}
