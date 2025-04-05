@@ -106,6 +106,7 @@ public class Tabuleiro {
 			switch(posicao.charAt(1)) {
 			case '1':
 				getPecasOriginais().put(posicao, new Rainha("preta"));
+				break;
 			case '8':
 				while(true) {
 					System.out.println("insira o nome da peca para qual desejas promover o peão");
@@ -158,4 +159,71 @@ public class Tabuleiro {
     public Map<String, Peca> getPecas() {
         return new HashMap<>(pecas);
     }
+
+
+    public void rocar(String destino, String cor) {
+    	if(destino.equals("c1") || destino.equals("c8")) {
+    		fazerRoqueMaior(cor);
+    	}
+    	else{
+    		fazerRoqueMenor(cor);
+    	}
+	}
+
+
+    public void fazerRoqueMaior(String corJogador){
+		Peca rei;
+		Peca torreEsquerda;
+		//remove-se as peças rei e torre da posição atual e realoca-se elas nas casas pós-roque
+		if(corJogador.equals("branca")) { 
+			pecas.remove("e1");
+			pecas.remove("a1");
+			pecas.put("c1", new Rei(corJogador));
+	        pecas.put("d1", new Torre(corJogador));
+	        //atualização do booleano "moveu"
+	        rei = getPeca("c1");
+	        torreEsquerda = getPeca("d1");
+		}
+		//a lógica para as peças pretas é análoga
+		else{ 
+			pecas.put("c8", new Rei(corJogador));
+			pecas.remove("e8");
+			pecas.remove("a8");
+	        pecas.put("d8", new Torre(corJogador));
+	        //atualização do booleano "moveu"
+	        rei = getPeca("c8");
+	        torreEsquerda = getPeca("d8");
+		}        
+		//indica que as peças se moveram(evitando futuros roques ilegais)
+		rei.mover();
+        torreEsquerda.mover();
+	}
+
+
+
+	public void fazerRoqueMenor(String corJogador) {
+		Peca rei;
+		Peca torreDireita;
+		//remove o rei e a torre de suas posições as coloca nas posições pós-roque
+		if(corJogador.equals("branca")){
+			pecas.remove("e1");
+			pecas.remove("h1");
+			pecas.put("g1", new Rei(corJogador));
+	        pecas.put("f1", new Torre(corJogador));
+			rei = getPeca("g1");
+			torreDireita = getPeca("f1");
+		}
+		//lógica análoga para as pretas
+		else{
+			pecas.remove("e8");
+			pecas.remove("h8");
+			pecas.put("g8", new Rei(corJogador));
+	        pecas.put("f8", new Torre(corJogador));
+			rei = getPeca("g8");
+			torreDireita = getPeca("f8");
+		}
+		//indica que a torre e o rei se moveram (evitando futuros roques ilegais) 
+        torreDireita.mover();
+        rei.mover();
+	}
 }

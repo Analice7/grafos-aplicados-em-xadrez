@@ -6,6 +6,7 @@ import jogadores.Humano;
 import jogadores.Jogador;
 import jogadores.Robo;
 import pecas.Peao;
+import pecas.Rei;
 import xadrez.Peca;
 import xadrez.Tabuleiro;
 import regras.RegrasXadrez;
@@ -43,6 +44,10 @@ public class Main {
                 			tabuleiro.promoverPeao(jogada[1]);
                 		}
                 	}
+                	if(tabuleiro.getPeca(jogada[1]) instanceof Rei && jogada[0].charAt(0)==jogada[1].charAt(0)+2 || 
+                			jogada[0].charAt(0)==jogada[1].charAt(0)-2 ){
+                		tabuleiro.rocar(jogada[1], jogadorAtual.getCor());
+                	}	
                     jogadorAtual = (jogadorAtual == jogadorBranco) ? jogadorPreto : jogadorBranco;
                 }
             }
