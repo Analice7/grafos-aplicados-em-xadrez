@@ -3,6 +3,7 @@ import java.util.*;
 
 import xadrez.Peca;
 import xadrez.Tabuleiro;
+import xadrez.Grafo;
 import regras.RegrasXadrez;
 
 public class Robo extends Jogador{
@@ -16,7 +17,7 @@ public class Robo extends Jogador{
     
     /**
      * Método principal que decide a melhor jogada para o robô.
-     * Implementa a lógica de decisão usando o algoritmo Minimax.
+     * Implementa a lógica de decisão usando o algoritmo Minimax e utiliza o grafo de movimentos.
      * @param tabuleiro o estado atual do tabuleiro
      * @param cor a cor das peças do robô
      * @param scanner scanner para entrada (não utilizado pelo robô)
@@ -27,19 +28,21 @@ public class Robo extends Jogador{
         int melhorValor = Integer.MIN_VALUE;
         String[] melhorJogada = null;
         
-        // 1. Crie uma cópia defensiva das peças
+        // Obter o grafo de movimentos do tabuleiro
+        Grafo grafo = tabuleiro.getGrafo();
+        
         Map<String, Peca> pecasCopia = new HashMap<>(tabuleiro.getPecas());
         
         for (Map.Entry<String, Peca> entry : pecasCopia.entrySet()) {
             if (entry.getValue().getCor().equals(cor)) {
                 String origem = entry.getKey();
-                Peca peca = entry.getValue();
                 
-                // 2. Crie uma cópia dos movimentos válidos
-                List<String> movimentos = new ArrayList<>(peca.movimentosValidos(origem, tabuleiro));
+                // Usar o BFS do grafo para obter os movimentos possíveis a partir da origem
+                Set<String> destinosPossiveis = grafo.bfs(origem);
                 
-                for (String destino : movimentos) {
-                    // 3. Use os métodos de simulação do Tabuleiro
+                destinosPossiveis.remove(origem);
+                
+                for (String destino : destinosPossiveis) {
                     Peca capturada = tabuleiro.simularMovimento(origem, destino);
                     int valor = minimax(tabuleiro, PROFUNDIDADE_MAXIMA - 1, 
                                       Integer.MIN_VALUE, Integer.MAX_VALUE, false, cor);
@@ -58,6 +61,7 @@ public class Robo extends Jogador{
     /**
      * Implementação do algoritmo Minimax com poda Alpha-Beta.
      * Avalia recursivamente todas as possíveis jogadas até a profundidade máxima.
+     * Utiliza o grafo de movimentos do tabuleiro.
      * @param tabuleiro estado atual do tabuleiro
      * @param profundidade profundidade atual da busca
      * @param alpha valor alpha para poda (limite inferior)
@@ -66,9 +70,8 @@ public class Robo extends Jogador{
      * @param cor cor das peças do robô
      * @return valor de avaliação da posição atual
      */
-    private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, 
-                       boolean maximizando, String cor) {
-        // 4. Crie uma cópia defensiva para o minimax
+    private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, boolean maximizando, String cor) {
+   
         Map<String, Peca> pecasCopia = new HashMap<>(tabuleiro.getPecas());
         
         if (profundidade == 0 || jogoAcabou(tabuleiro, cor)) {
@@ -77,14 +80,19 @@ public class Robo extends Jogador{
         
         int valor = maximizando ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         
+        // Obter o grafo de movimentos do tabuleiro
+        Grafo grafo = tabuleiro.getGrafo();
+        
         for (Map.Entry<String, Peca> entry : pecasCopia.entrySet()) {
             if (entry.getValue().getCor().equals(maximizando ? cor : corOposta(cor))) {
                 String origem = entry.getKey();
-                Peca peca = entry.getValue();
                 
-                List<String> movimentos = new ArrayList<>(peca.movimentosValidos(origem, tabuleiro));
+                // Usar o BFS do grafo para obter os movimentos possíveis a partir da origem
+                Set<String> destinosPossiveis = grafo.bfs(origem);
+                // Remove a própria posição de origem dos destinos possíveis
+                destinosPossiveis.remove(origem);
                 
-                for (String destino : movimentos) {
+                for (String destino : destinosPossiveis) {
                     Peca capturada = tabuleiro.simularMovimento(origem, destino);
                     int avaliacao = minimax(tabuleiro, profundidade-1, alpha, beta, !maximizando, cor);
                     tabuleiro.desfazerSimulacao(origem, destino, capturada);
@@ -106,22 +114,10 @@ public class Robo extends Jogador{
         return valor;
     }
     
-    /**
-     * Retorna a cor oposta à fornecida.
-     * @param cor cor atual ("branca" ou "preta")
-     * @return cor oposta
-     */
     private String corOposta(String cor) {
         return cor.equals("branca") ? "preta" : "branca";
     }
     
-    /**
-     * Avalia o estado atual do tabuleiro para a cor especificada.
-     * Considera o valor material das peças e sua posição no tabuleiro.
-     * @param tabuleiro estado atual do tabuleiro
-     * @param cor cor do jogador sendo avaliado
-     * @return valor numérico representando a vantagem da posição
-     */
     private int avaliarTabuleiro(Tabuleiro tabuleiro, String cor) {
         int valorTotal = 0;
         Map<String, Peca> pecas = tabuleiro.getPecas();
@@ -164,9 +160,6 @@ public class Robo extends Jogador{
         if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
             return true;
         }
-        
-        // 4. Verifica repetição de posições (opcional)
-        // if (isRepeticaoPosicoes()) {...}
         
         return false;
     }

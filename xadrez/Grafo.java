@@ -33,4 +33,16 @@ public class Grafo {
         return visitados;
     }
 
+    public Grafo copiar() {
+    Grafo copia = new Grafo();
+    
+    for (Map.Entry<String, List<String>> entry : this.adjacencia.entrySet()) {
+        copia.adjacencia.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+    }
+    
+    copia.pesos = new HashMap<>(this.pesos);
+    
+    return copia;
+}
+
 }

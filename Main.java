@@ -1,5 +1,3 @@
-
-
 import java.util.*;
 
 import jogadores.Humano;
@@ -62,7 +60,7 @@ public class Main {
 
     private String[] obterJogadaValida(Scanner scanner) {
         if (jogadorAtual instanceof Robo) {
-            System.out.println("IA está pensando...");
+            System.out.println("Robo esta pensando...");
             try {
                 Thread.sleep(1000); // Pausa dramática
             } catch (InterruptedException e) {

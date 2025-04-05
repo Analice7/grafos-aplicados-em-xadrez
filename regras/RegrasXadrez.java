@@ -1,10 +1,9 @@
 package regras;
 import xadrez.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import pecas.Bispo;
 import pecas.Cavalo;
@@ -17,43 +16,60 @@ public class RegrasXadrez {
     // Verifica se o rei da cor especificada está em xeque-mate
     // Retorna true se o rei está em xeque e não há movimentos legais que possam tirá-lo do xeque
     public static boolean estaEmXequeMate(String cor, Tabuleiro tabuleiro) {
-        
-        Map<String, Peca> copiaPecas = new HashMap<>(tabuleiro.getPecas());
-        
-        if (!estaEmXeque(cor, tabuleiro)) return false;
-        
-        for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
-            if (entry.getValue().getCor().equals(cor)) {
-                // Cria cópia da lista de movimentos válidos
-                List<String> movimentos = new ArrayList<>(
-                    entry.getValue().movimentosValidos(entry.getKey(), tabuleiro)
-                );
-                if (!movimentos.isEmpty()) {
-                    return false;
+            if (!estaEmXeque(cor, tabuleiro)) return false;
+            
+            Map<String, Peca> copiaPecas = new HashMap<>(tabuleiro.getPecas());
+            Grafo grafo = tabuleiro.getGrafo();
+            
+            for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
+                if (entry.getValue().getCor().equals(cor)) {
+                    String origem = entry.getKey();
+                    
+                    // Usar BFS para obter todos os movimentos válidos a partir da origem
+                    Set<String> destinosPossiveis = grafo.bfs(origem);
+                   
+                    destinosPossiveis.remove(origem);
+                    
+                    // Se há ao menos um movimento possível para alguma peça, não é xeque-mate
+                    if (!destinosPossiveis.isEmpty()) {
+                        // Verificar se algum dos movimentos tira do xeque
+                        for (String destino : destinosPossiveis) {
+                            
+                            Peca capturada = tabuleiro.simularMovimento(origem, destino);
+                            
+                            boolean aindaEmXeque = estaEmXeque(cor, tabuleiro);
+                            
+                            tabuleiro.desfazerSimulacao(origem, destino, capturada);
+                            
+                            if (!aindaEmXeque) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
+            return true;
         }
-        return true;
-    }
-
+    
     // Verifica se o rei da cor especificada está em xeque
     // Retorna true se alguma peça adversária está atacando a posição do rei
     public static boolean estaEmXeque(String cor, Tabuleiro tabuleiro) {
-
         String posicaoRei = encontrarPosicaoRei(cor, tabuleiro);
-
         if (posicaoRei == null) return false;
         
         Map<String, Peca> copiaPecas = new HashMap<>(tabuleiro.getPecas());
+        Grafo grafo = tabuleiro.getGrafo();
         
         for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
             Peca peca = entry.getValue();
             if (!peca.getCor().equals(cor)) {
-                // Cria cópia da lista de ameaças
-                List<String> ameacas = new ArrayList<>(
-                    peca.movimentosBasicos(entry.getKey(), tabuleiro)
-                );
-                if (ameacas.contains(posicaoRei)) {
+                String origem = entry.getKey();
+                
+                // Usar BFS para obter todos os movimentos válidos desta peça adversária
+                Set<String> destinosPossiveis = grafo.bfs(origem);
+                
+                // Se o rei estiver entre os destinos possíveis, está em xeque
+                if (destinosPossiveis.contains(posicaoRei)) {
                     return true;
                 }
             }

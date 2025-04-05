@@ -20,7 +20,6 @@ public class Tabuleiro {
         this.contadorLances=0;
         inicializarTabuleiro();
     }
-    
 
     /// Inicializa o tabuleiro com as peças em suas posições iniciais
     // e constrói o grafo de movimentos possíveis
@@ -60,7 +59,9 @@ public class Tabuleiro {
     // Constrói o grafo de movimentos possíveis para todas as peças no tabuleiro
     // Cada aresta representa um movimento válido que uma peça pode fazer
     public void construirGrafoMovimentos() {
-        grafo = new Grafo();
+    
+        this.grafo = new Grafo();
+        
         Map<String, Peca> copiaPecas = new HashMap<>(pecas);
         
         for (Map.Entry<String, Peca> entry : copiaPecas.entrySet()) {
@@ -102,10 +103,12 @@ public class Tabuleiro {
     // Retorna a peça que seria capturada neste movimento (ou null se não houver captura)
     // Útil para verificar consequências de movimentos sem efetivá-los
     public Peca simularMovimento(String origem, String destino) {
-        Peca pecaMovida = pecas.remove(origem);
-        Peca capturada = pecas.get(destino);
-        if (capturada != null) pecas.remove(destino);
-        pecas.put(destino, pecaMovida);
+        Map<String, Peca> copiaPecas = new HashMap<>(this.getPecas());
+        Peca pecaMovida = copiaPecas.remove(origem);
+        Peca capturada = copiaPecas.get(destino);
+        if (capturada != null) copiaPecas.remove(destino);
+        copiaPecas.put(destino, pecaMovida);
+        construirGrafoMovimentos();
         return capturada;
     }
 
@@ -149,12 +152,12 @@ public class Tabuleiro {
 	// Desfaz uma simulação de movimento, restaurando o tabuleiro ao estado anterior
     // Recebe as posições de origem e destino e a peça que foi capturada na simulação
     public void desfazerSimulacao(String origem, String destino, Peca pecaCapturada) {
-        Peca pecaMovida = pecas.remove(destino);
-        pecas.put(origem, pecaMovida);
-        if (pecaCapturada != null) pecas.put(destino, pecaCapturada);
+        Map<String, Peca> copiaPecas = new HashMap<>(this.getPecas());
+        Peca pecaMovida = copiaPecas.remove(destino);
+        copiaPecas.put(origem, pecaMovida);
+        if (pecaCapturada != null) copiaPecas.put(destino, pecaCapturada);
+        construirGrafoMovimentos();
     }
-    
-
     
     // Retorna a peça na posição especificada
     public Peca getPeca(String posicao) {
@@ -175,7 +178,6 @@ public class Tabuleiro {
     		fazerRoqueMenor(cor);
     	}
 	}
-
 
     public void fazerRoqueMaior(String corJogador){
 		Peca rei;
@@ -205,8 +207,6 @@ public class Tabuleiro {
         torreEsquerda.mover();
 	}
 
-
-
 	public void fazerRoqueMenor(String corJogador) {
 		Peca rei;
 		Peca torreDireita;
@@ -233,7 +233,6 @@ public class Tabuleiro {
         rei.mover();
 	}
 
-
 	/**
 	 * método que retorna o tanto de lances consecutivos sem captura ou movimentos de peão 
 	 * 
@@ -241,5 +240,9 @@ public class Tabuleiro {
 	public int getContadorLances() {
 		return contadorLances;
 	}
+
+    public Grafo getGrafo() {
+        return grafo;
+    }
     
 }
