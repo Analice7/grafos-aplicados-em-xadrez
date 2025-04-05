@@ -5,6 +5,7 @@ import java.util.*;
 import jogadores.Humano;
 import jogadores.Jogador;
 import jogadores.Robo;
+import pecas.Peao;
 import xadrez.Peca;
 import xadrez.Tabuleiro;
 import regras.RegrasXadrez;
@@ -37,6 +38,11 @@ public class Main {
                 String[] jogada = obterJogadaValida(scanner);
                 
                 if (tabuleiro.moverPeca(jogada[0], jogada[1])) {
+                	if(tabuleiro.getPeca(jogada[1]) instanceof Peao) {
+                		if(jogada[1].charAt(1)=='1' || jogada[1].charAt(1)=='8') {
+                			tabuleiro.promoverPeao(jogada[1]);
+                		}
+                	}
                     jogadorAtual = (jogadorAtual == jogadorBranco) ? jogadorPreto : jogadorBranco;
                 }
             }

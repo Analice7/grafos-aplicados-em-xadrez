@@ -100,8 +100,46 @@ public class Tabuleiro {
         pecas.put(destino, pecaMovida);
         return capturada;
     }
-    
-    // Desfaz uma simulação de movimento, restaurando o tabuleiro ao estado anterior
+
+    public void promoverPeao(String posicao) {
+		if(getPeca(posicao) instanceof Peao) {
+			switch(posicao.charAt(1)) {
+			case '1':
+				getPecasOriginais().put(posicao, new Rainha("preta"));
+			case '8':
+				while(true) {
+					System.out.println("insira o nome da peca para qual desejas promover o peão");
+					Scanner sc = new Scanner(System.in);
+					String opcao = sc.nextLine();
+					switch(opcao.toLowerCase()){
+						case "cavalo":
+							getPecasOriginais().put(posicao, new Cavalo("branca"));
+							return;
+						case "bispo":
+							getPecasOriginais().put(posicao, new Bispo("branca"));
+							return;
+						case "torre":
+							getPecasOriginais().put(posicao, new Torre("branca"));
+							return;
+						case "rainha":
+							getPecasOriginais().put(posicao, new Rainha("branca"));
+							return;
+						default:
+							System.out.println("insira um nome valido: \n Rainha \n Cavalo \n Bispo \n Torre" );
+					}
+					sc.close();
+				}
+			}
+		}
+		//indica que a peça já se moveu, caso o peão vire uma torre isso será importante para evitar roques inválidos
+		getPeca(posicao).mover();	
+	}
+
+	public Map<String, Peca> getPecasOriginais() {
+		return pecas;
+	}
+
+	// Desfaz uma simulação de movimento, restaurando o tabuleiro ao estado anterior
     // Recebe as posições de origem e destino e a peça que foi capturada na simulação
     public void desfazerSimulacao(String origem, String destino, Peca pecaCapturada) {
         Peca pecaMovida = pecas.remove(destino);
