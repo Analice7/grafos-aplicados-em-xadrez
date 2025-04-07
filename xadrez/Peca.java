@@ -17,27 +17,11 @@ public abstract class Peca {
     public List<String> movimentosValidos(String posicao, Tabuleiro tabuleiro) {
         List<String> movimentos = movimentosBasicos(posicao, tabuleiro);
         List<String> validos = new ArrayList<>();
-        Peca peca = tabuleiro.getPeca(posicao);
         
         for (String destino : movimentos) {
-            Peca noDestino = tabuleiro.getPeca(destino);
-            
-            if (noDestino != null && noDestino.getCor().equals(peca.getCor())) {
-                continue;
-            }
-            
-            tabuleiro.getPecas().remove(posicao);
-            Peca backup = tabuleiro.getPecas().put(destino, peca);
-            
-            boolean emXeque = RegrasXadrez.estaEmXeque(peca.getCor(), tabuleiro);
-            
-            // Rollback
-            tabuleiro.getPecas().put(posicao, peca);
-            if (backup != null) {
-                tabuleiro.getPecas().put(destino, backup);
-            } else {
-                tabuleiro.getPecas().remove(destino);
-            }
+            Peca capturada = tabuleiro.simularMovimento(posicao, destino);
+            boolean emXeque = RegrasXadrez.estaEmXeque(cor, tabuleiro);
+            tabuleiro.desfazerSimulacao(posicao, destino, capturada);
             
             if (!emXeque) {
                 validos.add(destino);
