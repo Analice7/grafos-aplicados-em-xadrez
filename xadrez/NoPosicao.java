@@ -1,7 +1,9 @@
 package xadrez;
 
 import java.util.Map;
-
+/**
+ * Nó que representa uma posicao do tabuleiro e sua incidencia na partida
+ */
 public class NoPosicao {
 	Map<String, Peca> posicao;
 	int incidencia;

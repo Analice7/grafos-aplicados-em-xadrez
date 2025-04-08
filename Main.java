@@ -5,25 +5,21 @@ import jogadores.Jogador;
 import jogadores.Robo;
 import pecas.Peao;
 import pecas.Rei;
-import xadrez.ListaPosicoes;
 import xadrez.NoPosicao;
 import xadrez.Peca;
 import xadrez.Tabuleiro;
-import regras.RegrasXadrez;
 
 public class Main {
     private final Tabuleiro tabuleiro;
     private final Jogador jogadorBranco;
     private final Jogador jogadorPreto;
     private Jogador jogadorAtual;
-    private ListaPosicoes lista;
 
     public Main() {
         this.tabuleiro = new Tabuleiro();
         this.jogadorBranco = new Humano("branca");
         this.jogadorPreto = new Robo("preta");
         this.jogadorAtual = jogadorBranco;
-        this.lista = new ListaPosicoes();
     }
     
     public void iniciarJogo() {
@@ -31,7 +27,7 @@ public class Main {
             while (true) {
                 mostrarTabuleiro();
                 
-                String resultado = verificarFimDeJogo(tabuleiro);
+                String resultado = tabuleiro.verificarFimDeJogo(jogadorAtual.getCor());
                 if (resultado != null) {
                     System.out.println(resultado);
                     break;
@@ -50,7 +46,7 @@ public class Main {
                 			jogada[0].charAt(0)==jogada[1].charAt(0)-2 )){
                 		tabuleiro.rocar(jogada[1], jogadorAtual.getCor());
                 	}	
-                	lista.inserir(new NoPosicao(tabuleiro.getPecas()));
+                	tabuleiro.getLista().inserir(new NoPosicao(tabuleiro.getPecas()));
                     jogadorAtual = (jogadorAtual == jogadorBranco) ? jogadorPreto : jogadorBranco;
                 }
             }
@@ -88,28 +84,7 @@ public class Main {
      * @param cor cor do jogador atual
      * @return true se o jogo terminou, false caso contrário
      */
-    private String verificarFimDeJogo(Tabuleiro tabuleiro) {
-        // Verifica para ambos os jogadores
-        if (RegrasXadrez.estaEmXequeMate("branca", tabuleiro)) {
-            return "Xeque-mate! As pretas venceram!";
-        }
-        if (RegrasXadrez.estaEmXequeMate("preta", tabuleiro)) {
-            return "Xeque-mate! As brancas venceram!";
-        }
-        if (RegrasXadrez.afogamento(jogadorAtual.getCor(), tabuleiro)) {
-            return "Afogamento! O jogo terminou em empate.";
-        }
-        if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
-            return "Material insuficiente para dar mate. Empate!";
-        }
-        if(RegrasXadrez.empateDos50Lances(tabuleiro)) {
-        	return "Empate! 50 movimentos foram realizados sem captura ou movimento de peão";
-        }
-        if(lista.empatePorRepeticao()) {
-        	return "Empate! a mesma posição foi repetida 3 vezes";
-        }
-        return null;
-    }
+
     
     private void mostrarTabuleiro() {
         System.out.println("\n   a b c d e f g h");

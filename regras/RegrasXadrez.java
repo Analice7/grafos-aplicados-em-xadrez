@@ -138,4 +138,12 @@ public class RegrasXadrez {
     	}
     	return false;
     }
+	public static boolean empatePorRepeticao(Tabuleiro tabuleiro) {
+		for(NoPosicao no: tabuleiro.getLista().getPosicoes()) {
+			if (no.getIncidencia()==3) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -7,21 +7,27 @@ import pecas.Peao;
 import pecas.Rainha;
 import pecas.Rei;
 import pecas.Torre;
+import regras.RegrasXadrez;
 
 public class Tabuleiro {
     private Grafo grafo;
     private Map<String, Peca> pecas;
     //contador de lances consecutivos sem captura ou movimento de peão
     private int contadorLances;
-
+    private ListaPosicoes lista;
     public Tabuleiro() {
         this.grafo = new Grafo();
         this.pecas = new HashMap<>();
         this.contadorLances=0;
+        this.lista= new ListaPosicoes();
         inicializarTabuleiro();
     }
 
-    /// Inicializa o tabuleiro com as peças em suas posições iniciais
+    public ListaPosicoes getLista() {
+		return lista;
+	}
+
+	/// Inicializa o tabuleiro com as peças em suas posições iniciais
     // e constrói o grafo de movimentos possíveis
     private void inicializarTabuleiro() {
         // Posições iniciais das peças
@@ -83,7 +89,7 @@ public class Tabuleiro {
     // Retorna true se o movimento foi válido e executado com sucesso
     // Atualiza o grafo de movimentos após a movimentação
     public boolean moverPeca(String origem, String destino) {
-        if (pecas.containsKey(origem) && grafo.bfs(origem).contains(destino)) {
+        if (pecas.containsKey(origem) && grafo.bfs(origem).contains(destino) && !origem.equals(destino)) {
             Peca pecaMovida = pecas.remove(origem);
             if(getPeca(destino)==null && !(pecaMovida instanceof Peao)) {
                 ++contadorLances;
@@ -226,7 +232,28 @@ public class Tabuleiro {
         torreDireita.mover();
         rei.mover();
 	}
-
+    public String verificarFimDeJogo(String corJogadorAtual) {
+        // Verifica para ambos os jogadores
+        if (RegrasXadrez.estaEmXequeMate("branca", this)) {
+            return "Xeque-mate! As pretas venceram!";
+        }
+        if (RegrasXadrez.estaEmXequeMate("preta", this)) {
+            return "Xeque-mate! As brancas venceram!";
+        }
+        if (RegrasXadrez.afogamento(corJogadorAtual, this)) {
+            return "Afogamento! O jogo terminou em empate.";
+        }
+        if (RegrasXadrez.materialInsuficiente(this)) {
+            return "Material insuficiente para dar mate. Empate!";
+        }
+        if(RegrasXadrez.empateDos50Lances(this)) {
+        	return "Empate! 50 movimentos foram realizados sem captura ou movimento de peão";
+        }
+        if(RegrasXadrez.empatePorRepeticao(this)) {
+        	return "Empate! a mesma posição foi repetida 3 vezes";
+        }
+        return null;
+    }
 	/**
 	 * método que retorna o tanto de lances consecutivos sem captura ou movimentos de peão 
 	 * 

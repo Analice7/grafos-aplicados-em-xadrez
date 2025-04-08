@@ -145,22 +145,10 @@ public class Robo extends Jogador{
         return valorTotal;
     }
 
-    private boolean jogoAcabou(Tabuleiro tabuleiro, String cor) {
-        // 1. Verifica xeque-mate
-        if (RegrasXadrez.estaEmXeque(cor, tabuleiro)) {
-            return true;
-        }
-        
-        // 2. Verifica afogamento (stalemate)
-        if (RegrasXadrez.afogamento(cor, tabuleiro)) {
-            return true;
-        }
-        
-        // 3. Verifica material insuficiente
-        if (RegrasXadrez.materialInsuficiente(tabuleiro)) {
-            return true;
-        }
-        
+    private boolean jogoAcabou(Tabuleiro tabuleiro, String corJogadorAtual) {
+    	if(tabuleiro.verificarFimDeJogo(corJogadorAtual)!=null) {
+    		return true;
+    	}
         return false;
     }
 }
