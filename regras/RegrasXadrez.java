@@ -25,7 +25,7 @@ public class RegrasXadrez {
                 if (entry.getValue().getCor().equals(cor)) {
                     String origem = entry.getKey();
                     
-                    // Usar BFS para obter todos os movimentos válidos a partir da origem
+                    // Usa BFS para obter todos os movimentos válidos a partir da origem
                     Set<String> destinosPossiveis = grafo.bfs(origem);
                    
                     destinosPossiveis.remove(origem);
@@ -65,7 +65,7 @@ public class RegrasXadrez {
             if (!peca.getCor().equals(cor)) {
                 String origem = entry.getKey();
                 
-                // Usar BFS para obter todos os movimentos válidos desta peça adversária
+                // Usa BFS para obter todos os movimentos válidos desta peça adversária
                 Set<String> destinosPossiveis = grafo.bfs(origem);
                 
                 // Se o rei estiver entre os destinos possíveis, está em xeque
@@ -98,7 +98,7 @@ public class RegrasXadrez {
         return false;
     }
 
-        // Encontra a posição no tabuleiro do rei da cor especificada
+    // Encontra a posição no tabuleiro do rei da cor especificada
     // Retorna a coordenada ou null se o rei não for encontrado
     private static String encontrarPosicaoRei(String cor, Tabuleiro tabuleiro) {
         Map<String, Peca> pecas = tabuleiro.getPecas(); 

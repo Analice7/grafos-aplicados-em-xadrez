@@ -3,8 +3,6 @@ import java.util.*;
 
 import xadrez.Peca;
 import xadrez.Tabuleiro;
-import xadrez.Grafo;
-import regras.RegrasXadrez;
 
 public class Robo extends Jogador{
 
@@ -28,21 +26,17 @@ public class Robo extends Jogador{
         int melhorValor = Integer.MIN_VALUE;
         String[] melhorJogada = null;
         
-        // Obter o grafo de movimentos do tabuleiro
-        Grafo grafo = tabuleiro.getGrafo();
-        
         Map<String, Peca> pecasCopia = new HashMap<>(tabuleiro.getPecas());
         
         for (Map.Entry<String, Peca> entry : pecasCopia.entrySet()) {
             if (entry.getValue().getCor().equals(cor)) {
                 String origem = entry.getKey();
+                Peca peca = entry.getValue();
                 
-                // Usar o BFS do grafo para obter os movimentos possíveis a partir da origem
-                Set<String> destinosPossiveis = grafo.bfs(origem);
+                List<String> movimentos = new ArrayList<>(peca.movimentosValidos(origem, tabuleiro));
                 
-                destinosPossiveis.remove(origem);
-                
-                for (String destino : destinosPossiveis) {
+                for (String destino : movimentos) {
+
                     Peca capturada = tabuleiro.simularMovimento(origem, destino);
                     int valor = minimax(tabuleiro, PROFUNDIDADE_MAXIMA - 1, 
                                       Integer.MIN_VALUE, Integer.MAX_VALUE, false, cor);
@@ -71,7 +65,7 @@ public class Robo extends Jogador{
      * @return valor de avaliação da posição atual
      */
     private int minimax(Tabuleiro tabuleiro, int profundidade, int alpha, int beta, boolean maximizando, String cor) {
-   
+        
         Map<String, Peca> pecasCopia = new HashMap<>(tabuleiro.getPecas());
         
         if (profundidade == 0 || jogoAcabou(tabuleiro, cor)) {
@@ -80,19 +74,14 @@ public class Robo extends Jogador{
         
         int valor = maximizando ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         
-        // Obter o grafo de movimentos do tabuleiro
-        Grafo grafo = tabuleiro.getGrafo();
-        
         for (Map.Entry<String, Peca> entry : pecasCopia.entrySet()) {
             if (entry.getValue().getCor().equals(maximizando ? cor : corOposta(cor))) {
                 String origem = entry.getKey();
+                Peca peca = entry.getValue();
                 
-                // Usar o BFS do grafo para obter os movimentos possíveis a partir da origem
-                Set<String> destinosPossiveis = grafo.bfs(origem);
-                // Remove a própria posição de origem dos destinos possíveis
-                destinosPossiveis.remove(origem);
+                List<String> movimentos = new ArrayList<>(peca.movimentosValidos(origem, tabuleiro));
                 
-                for (String destino : destinosPossiveis) {
+                for (String destino : movimentos) {
                     Peca capturada = tabuleiro.simularMovimento(origem, destino);
                     int avaliacao = minimax(tabuleiro, profundidade-1, alpha, beta, !maximizando, cor);
                     tabuleiro.desfazerSimulacao(origem, destino, capturada);
